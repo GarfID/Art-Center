@@ -6,9 +6,6 @@ import javax.persistence.*
 
 @MappedSuperclass
 open class BaseEntity(
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        val id: Long? = null,
         @Column(nullable = false)
         @Temporal(TemporalType.TIMESTAMP)
         val createdAt: Date = Date(),
@@ -16,4 +13,4 @@ open class BaseEntity(
         val deletedAt: Date? = null,
         @ManyToOne(fetch = FetchType.LAZY, optional = true)
         val deletedBy: SystemUser? = null
-)
+): SimpleEntity()

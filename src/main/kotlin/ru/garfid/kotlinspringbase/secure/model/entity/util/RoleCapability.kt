@@ -1,6 +1,8 @@
 package ru.garfid.kotlinspringbase.secure.model.entity.util
 
 import ru.garfid.kotlinspringbase.core.model.entity.util.BaseEntity
+import ru.garfid.kotlinspringbase.secure.model.entity.AuthorityAccessLevelEnum
+import ru.garfid.kotlinspringbase.secure.model.entity.AuthorityBlockEnum
 import ru.garfid.kotlinspringbase.secure.model.entity.Capability
 import ru.garfid.kotlinspringbase.secure.model.entity.Role
 import javax.persistence.*
@@ -13,5 +15,5 @@ class RoleCapability(
         val role: Role = Role(),
         @ManyToOne(fetch = FetchType.EAGER)
         @JoinColumn(name = "cap_id", nullable = false)
-        val capability: Capability = Capability(AuthorityAccessLevelEnum.VIEW)
+        val capability: Capability = Capability(AuthorityBlockEnum.NONE, AuthorityAccessLevelEnum.NONE)
 ): BaseEntity()

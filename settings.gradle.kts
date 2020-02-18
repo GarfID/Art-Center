@@ -1,1 +1,1 @@
-rootProject.name = "kotlin-spring-base"
+rootProject.name = "art_center"

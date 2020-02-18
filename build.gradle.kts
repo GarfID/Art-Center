@@ -10,7 +10,7 @@ plugins {
 
 group = "ru.garfid"
 version = "V1"
-java.sourceCompatibility = JavaVersion.VERSION_1_8
+//java.sourceCompatibility = JavaVersion.VERSION_1_8
 
 configurations {
     compileOnly {
@@ -49,6 +49,6 @@ tasks.withType<Test> {
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "1.8"
+        jvmTarget = JavaVersion.VERSION_11.toString()
     }
 }
