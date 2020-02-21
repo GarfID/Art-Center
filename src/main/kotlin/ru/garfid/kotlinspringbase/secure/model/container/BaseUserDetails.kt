@@ -6,7 +6,7 @@ import ru.garfid.kotlinspringbase.secure.model.entity.Capability
 import ru.garfid.kotlinspringbase.secure.model.entity.SecurityUser
 
 class BaseUserDetails(
-        private val securityUser: SecurityUser
+        val securityUser: SecurityUser
 ) : UserDetails {
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
         val result: MutableList<Capability> = mutableListOf()
