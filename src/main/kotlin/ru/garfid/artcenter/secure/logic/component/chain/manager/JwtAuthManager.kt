@@ -9,5 +9,4 @@ import ru.garfid.artcenter.secure.logic.component.chain.provider.LoginJwtProvide
 class JwtAuthManager(
         jwtProvider: JwtProvider,
         loginJwtProvider: LoginJwtProvider
-) : ProviderManager(listOf(loginJwtProvider, jwtProvider)) {
-}
+) : ProviderManager(listOf(loginJwtProvider, jwtProvider))

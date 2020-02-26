@@ -1,11 +1,13 @@
 package ru.garfid.artcenter.secure.model.container
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.security.authentication.AbstractAuthenticationToken
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.core.GrantedAuthority
 import ru.garfid.artcenter.secure.logic.service.JwtService
 
 class JwToken constructor(
+        @JsonIgnore
         var token: String? = null,
         tokenAuthorities: Collection<GrantedAuthority>? = null
 ) : AbstractAuthenticationToken(tokenAuthorities) {
@@ -23,22 +25,30 @@ class JwToken constructor(
         }
     }
 
-    override fun getCredentials(): Any? {
-        return ""
+    @JsonIgnore
+    override fun getName(): String {
+        return credentials
     }
 
-    override fun getPrincipal(): Any? {
+    @JsonIgnore
+    override fun getCredentials(): String {
+        val token = this.token
+        return if(token != null) {
+            JwtService.getSubject(token)
+        } else {
+            ""
+        }
+
+    }
+
+    @JsonIgnore
+    override fun getPrincipal(): String? {
         return token
     }
 
-    @Throws(IllegalArgumentException::class)
-    override fun setAuthenticated(isAuthenticated: Boolean) {
-        require(!isAuthenticated) { "Cannot set this token to trusted - use constructor which takes a GrantedAuthority list instead" }
-        super.setAuthenticated(false)
-    }
-
-    override fun eraseCredentials() {
-        super.eraseCredentials()
+    @JsonIgnore
+    override fun getAuthorities(): MutableCollection<GrantedAuthority> {
+        return super.getAuthorities()
     }
 
     fun refresh() {

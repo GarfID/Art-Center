@@ -1,33 +1,33 @@
 package ru.garfid.artcenter.secure.model.container
 
-import lombok.ToString
+import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
-import ru.garfid.artcenter.secure.model.entity.Capability
-import ru.garfid.artcenter.secure.model.entity.SecurityUser
+import ru.garfid.artcenter.core.model.entity.SystemUser
+import ru.garfid.artcenter.core.model.entity.linkers.RoomUsersCapability
 
 class BaseUserDetails(
-        val securityUser: SecurityUser
+        val systemUser: SystemUser
 ) : UserDetails {
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
-        val result: MutableList<Capability> = mutableListOf()
-        securityUser.roles.forEach { userRole -> userRole.role.capabilities.forEach { result.add(it.capability) } }
-        return result
+        return mutableListOf<RoomUsersCapability>()
     }
 
-    override fun isEnabled() = securityUser.user.deletedBy != null ?: false
+    override fun isEnabled() = systemUser.deletedBy != null ?: false
 
-    override fun getUsername() = securityUser.user.displayName
+    @JsonIgnore
+    override fun getUsername() = systemUser.displayName
 
-    override fun isCredentialsNonExpired() = securityUser.passwordExpired
+    override fun isCredentialsNonExpired() = systemUser.passwordExpired
 
-    override fun getPassword() = securityUser.password
+    @JsonIgnore
+    override fun getPassword() = systemUser.password
 
     override fun isAccountNonExpired() = true
 
-    override fun isAccountNonLocked() = securityUser.locked
+    override fun isAccountNonLocked() = systemUser.locked
 
     override fun toString(): String {
-        return securityUser.toString()
+        return systemUser.toString()
     }
 }

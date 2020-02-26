@@ -2,8 +2,8 @@ package ru.garfid.artcenter.secure.logic.component.chain.filter
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.security.authentication.AuthenticationServiceException
-import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.InternalAuthenticationServiceException
+import org.springframework.security.authentication.event.InteractiveAuthenticationSuccessEvent
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.context.SecurityContextHolder
@@ -14,21 +14,19 @@ import ru.garfid.artcenter.secure.logic.component.chain.manager.JwtAuthManager
 import ru.garfid.artcenter.secure.model.container.AuthContainer
 import ru.garfid.artcenter.secure.model.container.BasicAuthToken
 import ru.garfid.artcenter.secure.model.container.JwToken
-import ru.garfid.artcenter.secure.model.repo.SecurityUserRepo
-import java.awt.print.Book
+import java.io.IOException
 import java.net.URL
 import javax.servlet.FilterChain
+import javax.servlet.ServletException
 import javax.servlet.ServletRequest
 import javax.servlet.ServletResponse
-import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 
 @Component
 class LoginJwtAuthFilter(
-        authManager: JwtAuthManager,
-        val securityUserRepo: SecurityUserRepo
+        authManager: JwtAuthManager
 ) : AbstractAuthenticationProcessingFilter(AntPathRequestMatcher("/security/login", "POST")) {
     private var postOnly = false
 
@@ -47,18 +45,7 @@ class LoginJwtAuthFilter(
         val mapper = ObjectMapper()
         val authData = mapper.readValue(request.inputStream, AuthContainer::class.java)
 
-        val newToken = authenticationManager.authenticate(BasicAuthToken(authData))
-
-        return newToken
-    }
-
-    fun setDetails(request: HttpServletRequest?,
-                   authRequest: JwToken) {
-        authRequest.details = authenticationDetailsSource.buildDetails(request)
-    }
-
-    fun setPostOnly(postOnly: Boolean) {
-        this.postOnly = postOnly
+        return authenticationManager.authenticate(BasicAuthToken(authData))
     }
 
     override fun doFilter(req: ServletRequest, res: ServletResponse, chain: FilterChain) {
@@ -88,10 +75,11 @@ class LoginJwtAuthFilter(
             unsuccessfulAuthentication(request, response, failed)
             return
         }
-
+        /*
         if(authResult is JwToken && authResult.isValid()) {
             response.addCookie(Cookie("jwt", authResult.token))
         }
+        */
 
         successfulAuthentication(request, response, chain, authResult)
     }
@@ -104,5 +92,18 @@ class LoginJwtAuthFilter(
         }
 
         return false
+    }
+
+    @Throws(IOException::class, ServletException::class)
+    override fun successfulAuthentication(request: HttpServletRequest,
+                                          response: HttpServletResponse, chain: FilterChain, authResult: Authentication) {
+        if (eventPublisher != null) {
+            eventPublisher.publishEvent(InteractiveAuthenticationSuccessEvent(
+                    authResult, this.javaClass))
+        }
+
+        SecurityContextHolder.getContext().authentication = authResult
+
+        chain.doFilter(request, response)
     }
 }

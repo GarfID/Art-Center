@@ -1,17 +1,19 @@
 package ru.garfid.artcenter.secure.logic.component.chain.provider
 
-import org.springframework.security.authentication.*
+import org.springframework.security.authentication.AuthenticationProvider
+import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.userdetails.UsernameNotFoundException
-import org.springframework.stereotype.Component
-import ru.garfid.artcenter.secure.logic.service.JwtService
+import org.springframework.stereotype.Service
+import ru.garfid.artcenter.secure.logic.service.JwtDetailsService
 import ru.garfid.artcenter.secure.logic.service.SignInUtilService
 import ru.garfid.artcenter.secure.model.container.JwToken
 
-@Component
+@Service
 class JwtProvider(
-        val signInUtilService: SignInUtilService
+        val signInUtilService: SignInUtilService,
+        val jwtDetailsService: JwtDetailsService
 ) : AuthenticationProvider {
 
     @Throws(AuthenticationException::class)
@@ -26,12 +28,15 @@ class JwtProvider(
             throw BadCredentialsException("Invalid JWT")
         }
 
-        if(signInUtilService.isValidUser(jwToken.name)) {
-            throw UsernameNotFoundException("No such user found")
+        if(!signInUtilService.isValidUser(jwToken.credentials)) {
+            throw UsernameNotFoundException("No such user found " + jwToken.credentials)
         }
 
-        println("IT WORKED! I KNOW THIS TOKEN! You're ${jwToken.name}")
+        println("IT WORKED! I KNOW THIS TOKEN! You're ${jwToken.credentials}")
+
         jwToken.refresh()
+        jwToken.isAuthenticated = true
+        jwToken.details = jwtDetailsService.loadUserByUsername(jwToken.credentials)
 
         return jwToken
     }

@@ -5,7 +5,6 @@ import io.jsonwebtoken.Jws
 import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
-import org.springframework.security.authentication.BadCredentialsException
 import java.security.Key
 import java.util.*
 import java.util.Calendar.HOUR_OF_DAY
