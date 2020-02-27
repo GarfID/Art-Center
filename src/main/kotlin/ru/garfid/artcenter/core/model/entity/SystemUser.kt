@@ -2,14 +2,13 @@ package ru.garfid.artcenter.core.model.entity
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import lombok.ToString
-import ru.garfid.artcenter.core.model.entity.linkers.AuthorityAccessLevelEnum
+import ru.garfid.artcenter.room.model.entity.AuthorityAccessLevelEnum
 import ru.garfid.artcenter.core.model.entity.util.BaseEntity
 import javax.persistence.*
 
 @Entity(name = "User")
 @Table(name = "core_user")
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-@ToString
 class SystemUser(
         @Column(nullable = false, unique = true)
         val username: String = "guest",
